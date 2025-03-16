@@ -1,0 +1,30 @@
+# Backend
+/backend/tmp
+/backend/*.exe
+/backend/*.exe~
+/backend/*.dll
+/backend/*.so
+/backend/*.dylib
+/backend/*.test
+/backend/*.out
+
+# Frontend
+/frontend/node_modules
+/frontend/.pnp
+/frontend/.pnp.js
+/frontend/.next/
+/frontend/out/
+/frontend/build
+/frontend/.DS_Store
+/frontend/*.pem
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/.env*.local
+/frontend/.vercel
+/frontend/*.tsbuildinfo
+/frontend/next-env.d.ts
+
+# General
+.DS_Store
+*.log
