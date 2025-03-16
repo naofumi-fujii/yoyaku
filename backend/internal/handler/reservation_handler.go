@@ -6,15 +6,23 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/naofumi-fujii/489-yoyaku/backend/internal/model"
 	"github.com/naofumi-fujii/489-yoyaku/backend/internal/service"
 )
 
+// ReservationServiceInterface はテスト時にモック可能なインターフェース
+type ReservationServiceInterface interface {
+	CreateReservation(params service.CreateReservationParams) (*model.Reservation, error)
+	GetAllReservations() ([]*model.Reservation, error)
+	DeleteReservation(id string) error
+}
+
 type ReservationHandler struct {
-	service  *service.ReservationService
+	service  ReservationServiceInterface
 	validate *validator.Validate
 }
 
-func NewReservationHandler(service *service.ReservationService) *ReservationHandler {
+func NewReservationHandler(service ReservationServiceInterface) *ReservationHandler {
 	return &ReservationHandler{
 		service:  service,
 		validate: validator.New(),
