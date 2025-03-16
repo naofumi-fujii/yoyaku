@@ -73,6 +73,7 @@ export default function Home() {
           <Calendar 
             reservations={reservations}
             onSelect={handleSelect}
+            onDelete={handleDeleteReservation}
           />
         </div>
         
