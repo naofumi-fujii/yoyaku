@@ -1,6 +1,8 @@
 module github.com/naofumi-fujii/489-yoyaku/backend
 
-go 1.22
+go 1.23.0
+
+toolchain go1.23.7
 
 require (
 	github.com/go-playground/validator/v10 v10.25.0
@@ -22,5 +24,5 @@ require (
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/time v0.11.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
 )
