@@ -1,0 +1,41 @@
+name: Go Backend Tests
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/go-test.yml'
+    branches: [ main ]
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/go-test.yml'
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+        check-latest: true
+
+    - name: Install dependencies
+      run: cd backend && go mod download
+
+    - name: Run tests
+      run: cd backend && go test ./... -v -cover
+
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        working-directory: backend
+        args: --timeout=5m
