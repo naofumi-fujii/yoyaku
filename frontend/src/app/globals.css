@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: white;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+}
+
+.fc .fc-col-header-cell-cushion {
+  padding: 8px;
+}
+
+.fc .fc-daygrid-day-number {
+  padding: 8px;
+}
+
+.fc .fc-event {
+  cursor: pointer;
+}
