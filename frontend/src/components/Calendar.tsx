@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 interface CalendarProps {
   reservations: Reservation[];
-  onSelect: (info: { start: Date; end: Date }) => void;
+  onSelect: ({ start, end }: { start: Date; end: Date }) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -39,12 +39,12 @@ export default function Calendar({ reservations, onSelect, onDelete }: CalendarP
     extendedProps: { isReservation: true },
   }));
 
-  const handleEventClick = (info: any) => {
+  const handleEventClick = (eventInfo: any) => {
     // Only handle reservation events
-    if (info.event.extendedProps.isReservation) {
-      const eventId = info.event.id;
-      const start = info.event.start;
-      const end = info.event.end;
+    if (eventInfo.event.extendedProps.isReservation) {
+      const eventId = eventInfo.event.id;
+      const start = eventInfo.event.start;
+      const end = eventInfo.event.end;
       
       setSelectedEvent({ id: eventId, start, end });
       setShowDeleteModal(true);
