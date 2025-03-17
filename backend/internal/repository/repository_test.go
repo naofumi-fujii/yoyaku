@@ -39,8 +39,14 @@ func TestInMemoryReservationRepository_FindAll(t *testing.T) {
 	reservation2 := model.NewReservation(now.Add(2*time.Hour), now.Add(3*time.Hour))
 
 	// 実行：予約を追加
-	repo.Create(reservation1)
-	repo.Create(reservation2)
+	err := repo.Create(reservation1)
+	if err != nil {
+		t.Fatalf("Failed to create reservation1: %v", err)
+	}
+	err = repo.Create(reservation2)
+	if err != nil {
+		t.Fatalf("Failed to create reservation2: %v", err)
+	}
 
 	// 全件取得
 	reservations, err := repo.FindAll()
@@ -59,7 +65,10 @@ func TestInMemoryReservationRepository_FindByID(t *testing.T) {
 	repo := NewInMemoryReservationRepository()
 	now := time.Now()
 	reservation := model.NewReservation(now, now.Add(1*time.Hour))
-	repo.Create(reservation)
+	err := repo.Create(reservation)
+	if err != nil {
+		t.Fatalf("Failed to create reservation: %v", err)
+	}
 
 	// テストケース
 	tests := []struct {
@@ -103,10 +112,13 @@ func TestInMemoryReservationRepository_Delete(t *testing.T) {
 	repo := NewInMemoryReservationRepository()
 	now := time.Now()
 	reservation := model.NewReservation(now, now.Add(1*time.Hour))
-	repo.Create(reservation)
+	err := repo.Create(reservation)
+	if err != nil {
+		t.Fatalf("Failed to create reservation: %v", err)
+	}
 
 	// 実行：存在するIDを削除
-	err := repo.Delete(reservation.ID)
+	err = repo.Delete(reservation.ID)
 
 	// 検証
 	if err != nil {

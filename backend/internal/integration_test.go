@@ -58,7 +58,9 @@ func TestIntegrationCreateAndGetReservation(t *testing.T) {
 	
 	// 作成された予約のIDを取得
 	var createdReservation model.Reservation
-	json.Unmarshal(rec.Body.Bytes(), &createdReservation)
+	if err := json.Unmarshal(rec.Body.Bytes(), &createdReservation); err != nil {
+		t.Fatalf("Failed to unmarshal created reservation: %v", err)
+	}
 	
 	// 予約一覧取得リクエストの送信
 	req = httptest.NewRequest(http.MethodGet, "/api/reservations", nil)
@@ -73,7 +75,9 @@ func TestIntegrationCreateAndGetReservation(t *testing.T) {
 	
 	// 予約一覧の検証
 	var reservations []model.Reservation
-	json.Unmarshal(rec.Body.Bytes(), &reservations)
+	if err := json.Unmarshal(rec.Body.Bytes(), &reservations); err != nil {
+		t.Fatalf("Failed to unmarshal reservations: %v", err)
+	}
 	
 	if len(reservations) != 1 {
 		t.Errorf("Expected 1 reservation, got %d", len(reservations))
@@ -108,7 +112,9 @@ func TestIntegrationDeleteReservation(t *testing.T) {
 	
 	// 作成された予約のIDを取得
 	var createdReservation model.Reservation
-	json.Unmarshal(rec.Body.Bytes(), &createdReservation)
+	if err := json.Unmarshal(rec.Body.Bytes(), &createdReservation); err != nil {
+		t.Fatalf("Failed to unmarshal created reservation: %v", err)
+	}
 	
 	// 予約削除リクエストの送信
 	req = httptest.NewRequest(http.MethodDelete, "/api/reservations/"+createdReservation.ID, nil)
@@ -129,7 +135,9 @@ func TestIntegrationDeleteReservation(t *testing.T) {
 	
 	// 予約一覧の検証
 	var reservations []model.Reservation
-	json.Unmarshal(rec.Body.Bytes(), &reservations)
+	if err := json.Unmarshal(rec.Body.Bytes(), &reservations); err != nil {
+		t.Fatalf("Failed to unmarshal reservations: %v", err)
+	}
 	
 	if len(reservations) != 0 {
 		t.Errorf("Expected 0 reservations after deletion, got %d", len(reservations))
