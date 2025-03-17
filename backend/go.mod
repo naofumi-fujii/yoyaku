@@ -1,8 +1,6 @@
 module github.com/naofumi-fujii/489-yoyaku/backend
 
-go 1.23.0
-
-toolchain go1.23.7
+go 1.24.0
 
 require (
 	github.com/go-playground/validator/v10 v10.25.0
