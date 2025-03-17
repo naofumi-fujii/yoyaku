@@ -7,6 +7,7 @@
 ### バックエンド
 - Go 1.24
 - Echo (Webフレームワーク)
+- MySQL 5.7
 - Docker
 
 ### フロントエンド
@@ -17,16 +18,21 @@
 
 ## セットアップと実行方法
 
-### バックエンドのセットアップ
-
-#### Docker を使う場合
+### Docker を使う場合（推奨）
 
 ```bash
 # プロジェクトのルートディレクトリで実行
-docker-compose up -d
+docker-compose up --build
 ```
 
-#### 直接実行する場合
+これにより以下のサービスが起動します：
+- フロントエンド: http://localhost:3000
+- バックエンド: http://localhost:8080
+- MySQL: localhost:3306
+
+### 直接実行する場合
+
+#### バックエンドのセットアップ
 
 ```bash
 # バックエンドディレクトリに移動
@@ -41,7 +47,7 @@ go run cmd/server/main.go
 
 バックエンドサーバーは http://localhost:8080 で起動します。
 
-### フロントエンドのセットアップ
+#### フロントエンドのセットアップ
 
 ```bash
 # フロントエンドディレクトリに移動
@@ -80,3 +86,34 @@ npm run dev
 
 ### 予約の削除
 - エンドポイント: `DELETE /api/reservations/:id`
+
+## 開発環境のデータベース設定
+
+MySQL の接続情報:
+- ホスト: localhost (Docker: mysql)
+- ポート: 3306
+- データベース名: reservations
+- ユーザー名: root
+- パスワード: password
+
+## トラブルシューティング
+
+### Docker 環境での一般的な問題解決
+
+1. コンテナのログを確認
+```bash
+docker-compose logs -f
+```
+
+2. 特定のサービスのログを確認
+```bash
+docker-compose logs -f frontend
+docker-compose logs -f backend
+docker-compose logs -f mysql
+```
+
+3. コンテナを再ビルド
+```bash
+docker-compose down
+docker-compose up --build
+```
