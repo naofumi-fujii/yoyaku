@@ -13,15 +13,25 @@ export default function Home() {
   const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date } | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
 
   const fetchReservations = async () => {
     try {
       setIsLoading(true);
       const response = await axios.get('/api/reservations');
       setReservations(response.data);
+      setIsConnected(true);
+      setConnectionError(false);
     } catch (error) {
       console.error('Failed to fetch reservations:', error);
-      toast.error('予約の取得に失敗しました');
+      if (!isConnected) {
+        setConnectionError(true);
+        // Retry connection after 2 seconds
+        setTimeout(fetchReservations, 2000);
+      } else {
+        toast.error('予約の取得に失敗しました');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +73,24 @@ export default function Home() {
       toast.error('予約のキャンセルに失敗しました');
     }
   };
+
+  if (!isConnected) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-12">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-8">予約システム</h1>
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-700"></div>
+            <p className="text-xl">
+              {connectionError 
+                ? 'データベースへの接続に失敗しました。再試行中...' 
+                : 'データベースに接続中...'}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-6 md:p-12">
