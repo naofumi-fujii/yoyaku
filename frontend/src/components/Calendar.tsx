@@ -29,7 +29,7 @@ export default function Calendar({ reservations, onSelect, onDelete }: CalendarP
     }
   }, [reservations]);
 
-  const events = reservations.map((reservation) => ({
+  const events = reservations?.map((reservation) => ({
     id: reservation.id,
     title: '予約済み',
     start: new Date(reservation.startTime),
@@ -37,7 +37,7 @@ export default function Calendar({ reservations, onSelect, onDelete }: CalendarP
     backgroundColor: '#3788d8',
     borderColor: '#3788d8',
     extendedProps: { isReservation: true },
-  }));
+  })) || [];
 
   const handleEventClick = (eventInfo: any) => {
     // Only handle reservation events

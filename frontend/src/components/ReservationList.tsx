@@ -18,7 +18,7 @@ export default function ReservationList({ reservations, isLoading, onDelete }: R
     );
   }
 
-  if (reservations.length === 0) {
+  if (!reservations || reservations.length === 0) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md text-center">
         <p className="text-gray-500">予約はまだありません</p>
@@ -27,7 +27,7 @@ export default function ReservationList({ reservations, isLoading, onDelete }: R
   }
 
   // Sort reservations by start time (most recent first)
-  const sortedReservations = [...reservations].sort(
+  const sortedReservations = [...(reservations || [])].sort(
     (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
   );
 
