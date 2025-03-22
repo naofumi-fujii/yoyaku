@@ -1,29 +1,5 @@
 version: 2
 updates:
-  # フロントエンドの依存関係更新
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "frontend"
-    commit-message:
-      prefix: "frontend"
-      include: "scope"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-    ignore:
-      # メジャーバージョンの更新は手動で行う
-      - dependency-name: "@fullcalendar/*"
-      - dependency-name: "next"
-      - dependency-name: "react"
-      - dependency-name: "react-dom"
-
   # バックエンドの依存関係更新
   - package-ecosystem: "gomod"
     directory: "/backend"
@@ -35,12 +11,57 @@ updates:
       - "dependencies"
       - "backend"
     commit-message:
-      prefix: "backend"
+      prefix: "chore"
       include: "scope"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
     ignore:
-      # メジャーバージョンの更新は手動で行う
-      - dependency-name: "github.com/labstack/echo/v4" 
+      # メジャーバージョンの更新を除外
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # 関連するパッケージをグループ化
+      gorm:
+        patterns:
+          - "gorm.io/*"
+      gin:
+        patterns:
+          - "github.com/gin-gonic/gin*"
+      testify:
+        patterns:
+          - "github.com/stretchr/testify*"
+
+  # フロントエンドの依存関係更新
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      # メジャーバージョンの更新を除外
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # 関連するパッケージをグループ化
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
