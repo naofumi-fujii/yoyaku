@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # フロントエンドの依存関係更新
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "frontend"
+      include: "scope"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # メジャーバージョンの更新は手動で行う
+      - dependency-name: "@fullcalendar/*"
+      - dependency-name: "next"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+
+  # バックエンドの依存関係更新
+  - package-ecosystem: "gomod"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "backend"
+    commit-message:
+      prefix: "backend"
+      include: "scope"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # メジャーバージョンの更新は手動で行う
+      - dependency-name: "github.com/labstack/echo/v4" 
