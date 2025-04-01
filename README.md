@@ -11,7 +11,7 @@
 - Docker
 
 ### フロントエンド
-- Next.js 14
+- Next.js
 - TypeScript 5
 - Tailwind CSS 3
 - FullCalendar (カレンダーコンポーネント)
