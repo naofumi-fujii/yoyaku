@@ -11,10 +11,11 @@
 - Docker
 
 ### フロントエンド
-- Next.js
-- TypeScript
-- Tailwind CSS
+- Next.js 14
+- TypeScript 5
+- Tailwind CSS 3
 - FullCalendar (カレンダーコンポーネント)
+- Storybook (UIコンポーネント開発・テスト)
 
 ## セットアップと実行方法
 
@@ -58,9 +59,13 @@ npm install
 
 # 開発サーバーの起動
 npm run dev
+
+# Storybookの起動（UIコンポーネント開発・テスト用）
+npm run storybook
 ```
 
 フロントエンドは http://localhost:3000 で起動します。
+Storybookは http://localhost:6006 で起動します。
 
 ## 機能
 
@@ -68,6 +73,8 @@ npm run dev
 - カレンダーの一部を範囲選択すると予約ダイアログが表示されます
 - 予約を確定すると、カレンダーに予約が表示されます
 - 右側のパネルには予約の一覧が表示され、予約のキャンセルができます
+- アトミックデザインパターンに基づいたコンポーネント設計
+- Storybookによるコンポーネントのドキュメント化とテスト
 
 ## API
 
@@ -117,3 +124,16 @@ docker-compose logs -f mysql
 docker-compose down
 docker-compose up --build
 ```
+
+## プロジェクト構成
+
+### フロントエンド
+- アトミックデザインパターンを採用（詳細は `frontend/README-atomic-design.md` を参照）
+- Storybookによるコンポーネント開発（詳細は `frontend/README-storybook.md` を参照）
+
+### バックエンド
+- クリーンアーキテクチャを採用
+  - handler: APIエンドポイントの処理
+  - service: ビジネスロジック
+  - repository: データアクセス
+  - model: データモデル
