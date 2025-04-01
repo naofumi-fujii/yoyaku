@@ -12,7 +12,7 @@
 
 ### フロントエンド
 - Next.js
-- TypeScript 5
+- TypeScript
 - Tailwind CSS 3
 - FullCalendar (カレンダーコンポーネント)
 - Storybook (UIコンポーネント開発・テスト)
