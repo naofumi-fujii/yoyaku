@@ -137,3 +137,20 @@ docker-compose up --build
   - service: ビジネスロジック
   - repository: データアクセス
   - model: データモデル
+
+## テスト
+
+### バックエンドのテストカバレッジ
+```bash
+# backendディレクトリに移動
+cd backend
+
+# テスト実行とカバレッジレポート生成
+go test -v -coverprofile=coverage.out ./...
+
+# カバレッジレポートを関数ごとに表示
+go tool cover -func=coverage.out
+
+# HTMLカバレッジレポート生成（オプション）
+go tool cover -html=coverage.out -o coverage.html
+```
