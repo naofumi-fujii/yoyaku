@@ -473,6 +473,7 @@ func TestMySQLReservationRepository_FindByID(t *testing.T) {
 	}
 	if reservation == nil {
 		t.Error("Expected reservation, got nil")
+		return
 	}
 	if reservation.ID != id {
 		t.Errorf("Expected reservation ID %s, got %s", id, reservation.ID)
