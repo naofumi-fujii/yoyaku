@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -145,5 +146,26 @@ func TestReservationService_DeleteReservation(t *testing.T) {
 	}
 	if deletedID != testID {
 		t.Errorf("Expected ID %s to be deleted, got %s", testID, deletedID)
+	}
+}
+
+func TestReservationService_DeleteReservation_Error(t *testing.T) {
+	// 準備
+	mockRepo := newMockReservationRepository()
+	testID := "test-id"
+	expectedErr := errors.New("delete error")
+
+	mockRepo.deleteFunc = func(id string) error {
+		return expectedErr
+	}
+
+	service := NewReservationService(mockRepo)
+
+	// 実行
+	err := service.DeleteReservation(testID)
+
+	// 検証
+	if err != expectedErr {
+		t.Errorf("Expected error %v, got %v", expectedErr, err)
 	}
 }

@@ -1,9 +1,13 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/google/uuid"
 	"github.com/naofumi-fujii/489-yoyaku/backend/internal/model"
 )
 
@@ -137,5 +141,507 @@ func TestInMemoryReservationRepository_Delete(t *testing.T) {
 	// 検証
 	if err != nil {
 		t.Errorf("Expected no error when deleting non-existent ID, got %v", err)
+	}
+}
+
+// MySQLレポジトリのテスト
+
+func TestMySQLReservationRepository_New(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if repo == nil {
+		t.Error("Expected repository to be created, got nil")
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_New_Error(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリでエラーを返すように設定
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnError(errors.New("database error"))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if repo != nil {
+		t.Errorf("Expected nil repository, got %v", repo)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_Create(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テスト対象の予約データ
+	now := time.Now()
+	reservation := model.NewReservation(now, now.Add(1*time.Hour))
+
+	// INSERTクエリの期待値を設定
+	mock.ExpectExec("INSERT INTO reservations").WithArgs(
+		reservation.ID,
+		reservation.StartTime,
+		reservation.EndTime,
+		reservation.CreatedAt,
+		reservation.UpdatedAt,
+	).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	// 実行
+	err = repo.Create(reservation)
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_Create_Error(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テスト対象の予約データ
+	now := time.Now()
+	reservation := model.NewReservation(now, now.Add(1*time.Hour))
+
+	// INSERTクエリでエラーを返すように設定
+	mock.ExpectExec("INSERT INTO reservations").WithArgs(
+		reservation.ID,
+		reservation.StartTime,
+		reservation.EndTime,
+		reservation.CreatedAt,
+		reservation.UpdatedAt,
+	).WillReturnError(errors.New("database error"))
+
+	// 実行
+	err = repo.Create(reservation)
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindAll(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	now := time.Now()
+	id1 := uuid.New().String()
+	id2 := uuid.New().String()
+	startTime1 := now
+	endTime1 := now.Add(1 * time.Hour)
+	startTime2 := now.Add(2 * time.Hour)
+	endTime2 := now.Add(3 * time.Hour)
+	createdAt := now
+	updatedAt := now
+
+	// SELECTクエリの結果を設定
+	rows := sqlmock.NewRows([]string{"id", "start_time", "end_time", "created_at", "updated_at"}).
+		AddRow(id1, startTime1, endTime1, createdAt, updatedAt).
+		AddRow(id2, startTime2, endTime2, createdAt, updatedAt)
+
+	// SELECTクエリの期待値を設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations").
+		WillReturnRows(rows)
+
+	// 実行
+	reservations, err := repo.FindAll()
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if len(reservations) != 2 {
+		t.Errorf("Expected 2 reservations, got %d", len(reservations))
+	}
+	if reservations[0].ID != id1 {
+		t.Errorf("Expected first reservation ID %s, got %s", id1, reservations[0].ID)
+	}
+	if reservations[1].ID != id2 {
+		t.Errorf("Expected second reservation ID %s, got %s", id2, reservations[1].ID)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindAll_QueryError(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// SELECTクエリでエラーを返すように設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations").
+		WillReturnError(errors.New("database error"))
+
+	// 実行
+	reservations, err := repo.FindAll()
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if reservations != nil {
+		t.Errorf("Expected nil reservations, got %v", reservations)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindAll_ScanError(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// 型不一致によるスキャンエラーを発生させるために不正な列タイプを設定
+	rows := sqlmock.NewRows([]string{"id", "start_time", "end_time", "created_at", "updated_at"}).
+		AddRow("id1", "not-a-time", "not-a-time", "not-a-time", "not-a-time")
+
+	// SELECTクエリの期待値を設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations").
+		WillReturnRows(rows)
+
+	// 実行
+	reservations, err := repo.FindAll()
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if reservations != nil {
+		t.Errorf("Expected nil reservations, got %v", reservations)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindByID(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	now := time.Now()
+	id := uuid.New().String()
+	startTime := now
+	endTime := now.Add(1 * time.Hour)
+	createdAt := now
+	updatedAt := now
+
+	// SELECTクエリの結果を設定
+	rows := sqlmock.NewRows([]string{"id", "start_time", "end_time", "created_at", "updated_at"}).
+		AddRow(id, startTime, endTime, createdAt, updatedAt)
+
+	// SELECTクエリの期待値を設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations WHERE id = ?").
+		WithArgs(id).
+		WillReturnRows(rows)
+
+	// 実行
+	reservation, err := repo.FindByID(id)
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if reservation == nil {
+		t.Error("Expected reservation, got nil")
+	}
+	if reservation.ID != id {
+		t.Errorf("Expected reservation ID %s, got %s", id, reservation.ID)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindByID_NotFound(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	id := uuid.New().String()
+
+	// SELECTクエリで行が見つからないことを設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations WHERE id = ?").
+		WithArgs(id).
+		WillReturnError(sql.ErrNoRows)
+
+	// 実行
+	reservation, err := repo.FindByID(id)
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if reservation != nil {
+		t.Errorf("Expected nil reservation, got %v", reservation)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_FindByID_Error(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	id := uuid.New().String()
+
+	// SELECTクエリでエラーを返すように設定
+	mock.ExpectQuery("SELECT id, start_time, end_time, created_at, updated_at FROM reservations WHERE id = ?").
+		WithArgs(id).
+		WillReturnError(errors.New("database error"))
+
+	// 実行
+	reservation, err := repo.FindByID(id)
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+	if reservation != nil {
+		t.Errorf("Expected nil reservation, got %v", reservation)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_Delete(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	id := uuid.New().String()
+
+	// DELETEクエリの期待値を設定
+	mock.ExpectExec("DELETE FROM reservations WHERE id = ?").
+		WithArgs(id).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	// 実行
+	err = repo.Delete(id)
+
+	// 検証
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestMySQLReservationRepository_Delete_Error(t *testing.T) {
+	// SQLMockのセットアップ
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock: %v", err)
+	}
+	defer db.Close()
+
+	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
+	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
+
+	// レポジトリの作成
+	repo, err := NewMySQLReservationRepository(db)
+	if err != nil {
+		t.Fatalf("Failed to create repository: %v", err)
+	}
+
+	// テストデータ
+	id := uuid.New().String()
+
+	// DELETEクエリでエラーを返すように設定
+	mock.ExpectExec("DELETE FROM reservations WHERE id = ?").
+		WithArgs(id).
+		WillReturnError(errors.New("database error"))
+
+	// 実行
+	err = repo.Delete(id)
+
+	// 検証
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
+
+	// モックの期待通りに実行されたか確認
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
 	}
 }
