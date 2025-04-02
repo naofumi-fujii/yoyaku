@@ -140,6 +140,22 @@ docker-compose up --build
 
 ## テスト
 
+### バックエンドのテスト
+
+```bash
+# backendディレクトリに移動
+cd backend
+
+# 通常のテスト実行
+go test ./...
+
+# 詳細なテスト情報を表示
+go test -v ./...
+
+# 特定のパッケージのみテスト
+go test ./internal/repository/...
+```
+
 ### バックエンドのテストカバレッジ
 ```bash
 # backendディレクトリに移動
@@ -153,4 +169,17 @@ go tool cover -func=coverage.out
 
 # HTMLカバレッジレポート生成（オプション）
 go tool cover -html=coverage.out -o coverage.html
+```
+
+### 静的解析ツール
+
+```bash
+# backendディレクトリに移動
+cd backend
+
+# golangci-lintを実行
+golangci-lint run
+
+# 特定のディレクトリのみ解析
+golangci-lint run ./internal/...
 ```
