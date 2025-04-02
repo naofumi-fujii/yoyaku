@@ -33,6 +33,21 @@ jobs:
     - name: Run tests
       run: cd backend && go test ./... -v -cover
 
+    - name: Generate coverage report
+      run: |
+        cd backend
+        go test ./... -coverprofile=coverage.out
+        go tool cover -func=coverage.out
+        mkdir -p coverage-report
+        go tool cover -html=coverage.out -o coverage-report/index.html
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: backend/coverage-report/
+        retention-days: 7
+        
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v3
       with:
