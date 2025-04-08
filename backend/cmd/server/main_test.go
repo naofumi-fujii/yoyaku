@@ -56,7 +56,9 @@ func TestGetEnv(t *testing.T) {
 	defaultValue := "default_value"
 	
 	// 先に環境変数をクリア
-	os.Unsetenv(testKey)
+	if err := os.Unsetenv(testKey); err != nil {
+		t.Fatalf("Failed to unset environment variable: %v", err)
+	}
 	
 	result := getEnv(testKey, defaultValue)
 	if result != defaultValue {
@@ -66,7 +68,11 @@ func TestGetEnv(t *testing.T) {
 	// 環境変数がセットされている場合のテスト
 	expectedValue := "expected_value"
 	os.Setenv(testKey, expectedValue)
-	defer os.Unsetenv(testKey)
+	defer func() {
+		if err := os.Unsetenv(testKey); err != nil {
+			t.Fatalf("Failed to unset environment variable in defer: %v", err)
+		}
+	}()
 	
 	result = getEnv(testKey, defaultValue)
 	if result != expectedValue {
