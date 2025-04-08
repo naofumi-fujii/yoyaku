@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "backend"
@@ -35,7 +35,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "frontend"
