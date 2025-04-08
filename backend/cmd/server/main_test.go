@@ -15,13 +15,6 @@ import (
 	"github.com/naofumi-fujii/489-yoyaku/backend/internal/service"
 )
 
-// Helper function to safely close the database connection
-func closeDB(t *testing.T, db *sql.DB) {
-	if err := db.Close(); err != nil {
-		t.Fatalf("Failed to close database: %v", err)
-	}
-}
-
 func TestHealthCheck(t *testing.T) {
 	// Echo インスタンスの作成
 	e := echo.New()
@@ -93,7 +86,7 @@ func TestInitializeApp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer closeDB(t, db)
+	defer db.Close()
 
 	// テーブル作成クエリの期待値を設定
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -152,7 +145,7 @@ func TestDatabaseConnection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer closeDB(t, db)
+	defer db.Close()
 
 	// モックのPingが成功するように設定
 	mock.ExpectPing()
