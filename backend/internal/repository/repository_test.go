@@ -11,6 +11,13 @@ import (
 	"github.com/naofumi-fujii/489-yoyaku/backend/internal/model"
 )
 
+// Helper function to safely close the database connection
+func closeDB(t *testing.T, db *sql.DB) {
+	if err := db.Close(); err != nil {
+		t.Fatalf("Failed to close database: %v", err)
+	}
+}
+
 func TestInMemoryReservationRepository_Create(t *testing.T) {
 	// 準備
 	repo := NewInMemoryReservationRepository()
@@ -152,7 +159,7 @@ func TestMySQLReservationRepository_New(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -180,7 +187,7 @@ func TestMySQLReservationRepository_New_Error(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリでエラーを返すように設定
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnError(errors.New("database error"))
@@ -208,7 +215,7 @@ func TestMySQLReservationRepository_Create(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -252,7 +259,7 @@ func TestMySQLReservationRepository_Create_Error(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -296,7 +303,7 @@ func TestMySQLReservationRepository_FindAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -356,7 +363,7 @@ func TestMySQLReservationRepository_FindAll_QueryError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -394,7 +401,7 @@ func TestMySQLReservationRepository_FindAll_ScanError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -436,7 +443,7 @@ func TestMySQLReservationRepository_FindByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -491,7 +498,7 @@ func TestMySQLReservationRepository_FindByID_NotFound(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -533,7 +540,7 @@ func TestMySQLReservationRepository_FindByID_Error(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -575,7 +582,7 @@ func TestMySQLReservationRepository_Delete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
@@ -614,7 +621,7 @@ func TestMySQLReservationRepository_Delete_Error(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create mock: %v", err)
 	}
-	defer db.Close()
+	defer closeDB(t, db)
 
 	// テーブル作成クエリの期待値を設定（NewMySQLReservationRepositoryでの呼び出し）
 	mock.ExpectExec("CREATE TABLE IF NOT EXISTS reservations").WillReturnResult(sqlmock.NewResult(0, 0))
