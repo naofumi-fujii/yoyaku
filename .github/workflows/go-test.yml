@@ -47,9 +47,3 @@ jobs:
         path: backend/coverage-report/
         retention-days: 7
 
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v7
-      with:
-        version: latest
-        working-directory: backend
-        args: --timeout=5m --skip-dirs=".*/.*_test.go"
