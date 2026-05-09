@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import SplitLayout from '../../components/templates/SplitLayout';
 
 const meta: Meta<typeof SplitLayout> = {
