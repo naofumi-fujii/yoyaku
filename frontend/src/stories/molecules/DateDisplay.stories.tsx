@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import DateDisplay from '../../components/molecules/DateDisplay';
 
 const meta: Meta<typeof DateDisplay> = {

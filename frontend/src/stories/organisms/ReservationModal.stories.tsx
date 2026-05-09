@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import ReservationModal from '../../components/organisms/ReservationModal';
 
 const meta: Meta<typeof ReservationModal> = {

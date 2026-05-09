@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import ReservationItem from '../../components/molecules/ReservationItem';
 
 const meta: Meta<typeof ReservationItem> = {
